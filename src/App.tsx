@@ -2,15 +2,15 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Camera, Download, Image as ImageIcon, Sparkles, Type, Eye } from 'lucide-react';
 
 export default function App() {
-  const [word, setWord] = useState('引きこもり\n(引きこもり)');
-  const [translation, setTranslation] = useState('宅在家、不出門的人');
-  const [sentenceJP, setSentenceJP] = useState('連休は一歩も外に出ず、完全な引きこもり生活を送りました。\n連休は一歩も外に出ず、完全な引きこもり生活を送りました。'); 
-  const [themeColor, setThemeColor] = useState('yellow');
-  const [fontChoice, setFontChoice] = useState<'zen' | 'noto' | 'mplus'>('zen');
+  const [word, setWord] = useState('お部屋食\nおへやしょく');
+  const [translation, setTranslation] = useState('在房間內用餐、房內供餐');
+  const [sentenceJP, setSentenceJP] = useState('旅館でゆっくり過ごしたいから、夕食はお部屋食のプランを選んだよ。\n因為想在旅館裡悠閒地度過，所以晚餐選了在房間內用餐的方案。'); 
+  const [themeColor, setThemeColor] = useState('pink');
+  const [fontChoice, setFontChoice] = useState<'zen' | 'mplus' | 'noto'>('zen');
   
   // 字體大小控制
   const [wordFontSize, setWordFontSize] = useState(56);
-  const [sentenceFontSize, setSentenceFontSize] = useState(44);
+  const [sentenceFontSize, setSentenceFontSize] = useState(42);
   
   const [avatarImage, setAvatarImage] = useState<string | null>(null);
   const [illustrationImage, setIllustrationImage] = useState<string | null>(null);
@@ -64,16 +64,16 @@ export default function App() {
   };
 
   const themeColors: Record<string, { bg: string; primary: string; secondary: string; tape: string }> = {
-    yellow: { bg: '#FFFBEB', primary: '#FBBF24', secondary: '#FDE68A', tape: '#FCA5A5' },
-    blue: { bg: '#EFF6FF', primary: '#60A5FA', secondary: '#BFDBFE', tape: '#FBBF24' },
-    pink: { bg: '#FDF2F8', primary: '#F472B6', secondary: '#FBCFE8', tape: '#6EE7B7' },
-    mint: { bg: '#F0FDF4', primary: '#4ADE80', secondary: '#BBF7D0', tape: '#F472B6' },
+    pink: { bg: '#FDF2F8', primary: '#EC4899', secondary: '#FBCFE8', tape: '#6EE7B7' },
+    yellow: { bg: '#FFFBEB', primary: '#F59E0B', secondary: '#FDE68A', tape: '#FCA5A5' },
+    blue: { bg: '#EFF6FF', primary: '#3B82F6', secondary: '#BFDBFE', tape: '#FBBF24' },
+    mint: { bg: '#F0FDF4', primary: '#10B981', secondary: '#BBF7D0', tape: '#F472B6' },
   };
 
   const fontFamilies = {
     zen: '"Zen Maru Gothic", "Noto Sans JP", "Noto Sans TC", sans-serif',
-    noto: '"Noto Sans JP", "Noto Sans TC", "Microsoft JhengHei", sans-serif',
     mplus: '"M PLUS Rounded 1c", "Zen Maru Gothic", sans-serif',
+    noto: '"Noto Sans JP", "Noto Sans TC", "Microsoft JhengHei", sans-serif',
   };
 
   const drawRoundedRect = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
@@ -90,59 +90,59 @@ export default function App() {
     ctx.closePath();
   };
 
-  // 核心：即時渲染 Canvas
+  // 核心：即時渲染 Canvas (完全比照原版大尺寸拍立得與日系溫潤排版)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const S = 1080;
-    const colors = themeColors[themeColor] || themeColors.yellow;
+    const colors = themeColors[themeColor] || themeColors.pink;
     const font = fontFamilies[fontChoice] || fontFamilies.zen;
 
-    // 1. 清空與圓角背景
+    // 1. 清空與圓角大背景
     ctx.clearRect(0, 0, S, S);
     ctx.fillStyle = colors.bg;
-    drawRoundedRect(ctx, 0, 0, S, S, 60);
+    drawRoundedRect(ctx, 0, 0, S, S, 54);
     ctx.fill();
 
-    // 2. 裝飾圓形（日系粉彩漸層點綴）
-    ctx.globalAlpha = 0.35;
+    // 2. 裝飾背景柔和圓形
+    ctx.globalAlpha = 0.45;
     ctx.fillStyle = colors.secondary;
-    ctx.beginPath(); ctx.arc(S * 0.85, S * 0.05, S * 0.28, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(S * 0.08, S * 0.95, S * 0.32, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(S * 0.88, S * 0.08, S * 0.32, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(S * 0.06, S * 0.94, S * 0.35, 0, Math.PI * 2); ctx.fill();
     ctx.globalAlpha = 1;
 
-    // 3. Header: 大頭照 + 頻道名稱
-    const headerY = 65;
+    // 3. Header: 大頭照 + 標題與 IG 帳號
+    const headerY = 60;
     ctx.save();
-    ctx.beginPath(); ctx.arc(110, headerY + 56, 56, 0, Math.PI * 2);
+    ctx.beginPath(); ctx.arc(110, headerY + 58, 58, 0, Math.PI * 2);
     ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = 'rgba(0,0,0,0.08)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4;
+    ctx.shadowColor = 'rgba(0,0,0,0.1)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 4;
     ctx.fill();
     ctx.shadowColor = 'transparent';
     
-    ctx.beginPath(); ctx.arc(110, headerY + 56, 50, 0, Math.PI * 2); ctx.clip();
+    ctx.beginPath(); ctx.arc(110, headerY + 58, 52, 0, Math.PI * 2); ctx.clip();
     if (loadedAvatar) {
       const imgW = loadedAvatar.width; const imgH = loadedAvatar.height;
-      const scale = Math.max(100 / imgW, 100 / imgH);
+      const scale = Math.max(104 / imgW, 104 / imgH);
       const drawW = imgW * scale; const drawH = imgH * scale;
-      ctx.drawImage(loadedAvatar, 110 - drawW / 2, headerY + 56 - drawH / 2, drawW, drawH);
+      ctx.drawImage(loadedAvatar, 110 - drawW / 2, headerY + 58 - drawH / 2, drawW, drawH);
     } else {
-      ctx.fillStyle = colors.secondary; ctx.fillRect(60, headerY + 6, 100, 100);
-      ctx.fillStyle = '#1f2937'; ctx.font = `900 44px ${font}`;
+      ctx.fillStyle = colors.secondary; ctx.fillRect(58, headerY + 6, 104, 104);
+      ctx.fillStyle = '#1f2937'; ctx.font = `900 46px ${font}`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('吉', 110, headerY + 56);
+      ctx.fillText('吉', 110, headerY + 58);
       ctx.textAlign = 'left';
     }
     ctx.restore();
 
-    ctx.fillStyle = '#1f2937'; ctx.font = `900 44px ${font}`; ctx.textBaseline = 'middle';
-    ctx.fillText('吉武的日文小教室', 185, headerY + 42);
-    ctx.fillStyle = '#6b7280'; ctx.font = `700 20px ${font}`;
-    ctx.fillText('@languagetrailsfree', 185, headerY + 78);
+    ctx.fillStyle = '#1e293b'; ctx.font = `900 46px ${font}`; ctx.textBaseline = 'middle';
+    ctx.fillText('吉武的日文小教室', 188, headerY + 44);
+    ctx.fillStyle = '#64748b'; ctx.font = `700 22px ${font}`;
+    ctx.fillText('@languagetrailsfree', 188, headerY + 80);
 
-    // 4. 計算例句區域高度 (動態伸縮)
+    // 4. 計算底部例句筆記本高度與位置
     ctx.font = `700 ${sentenceFontSize}px ${font}`;
     const maxNoteTextW = 810;
     const wrappedLines: string[] = [];
@@ -158,52 +158,53 @@ export default function App() {
     }
     
     const lineCount = Math.max(2, wrappedLines.length);
-    const noteTopPad = 72; 
+    const noteTopPad = 74; 
     const noteBotPad = 32; 
-    const lineH = Math.floor(sentenceFontSize * 1.6);
+    const lineH = Math.floor(sentenceFontSize * 1.58);
     const noteH = noteTopPad + lineCount * lineH + noteBotPad;
-    const noteY = S - noteH - 45; 
+    const noteY = S - noteH - 42; 
 
-    // 5. 中間單字卡區域
-    const cardY = 220;
+    // 5. 中間單字卡區域 (白底半透明大卡片)
+    const cardY = 226;
     const cardH = noteY - cardY - 26; 
-    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fillStyle = 'rgba(255,255,255,0.88)';
+    ctx.shadowColor = 'rgba(0,0,0,0.03)'; ctx.shadowBlur = 16; ctx.shadowOffsetY = 4;
     drawRoundedRect(ctx, 45, cardY, S - 90, cardH, 44); ctx.fill();
+    ctx.shadowColor = 'transparent';
     ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 3;
     drawRoundedRect(ctx, 45, cardY, S - 90, cardH, 44); ctx.stroke();
 
-    // 6. 右側拍立得相框 (動態依 cardH 調整大小，確保完美收納於卡片內)
-    const targetPolaroidH = Math.min(360, Math.max(240, cardH - 40));
-    const polaroidH = targetPolaroidH;
-    const polaroidW = Math.round(polaroidH * 0.88);
-    const polaroidX = S - 45 - polaroidW - 32;
-    const polaroidY = cardY + (cardH - polaroidH) / 2;
+    // 6. 右側大尺寸拍立得相框 (原版大器比例：寬約 390px、高約 430px，自然微突出 card 邊界，立體層次感極佳)
+    const polaroidW = 390;
+    const polaroidH = 430;
+    const polaroidX = S - 45 - polaroidW - 18;
+    const polaroidY = cardY + (cardH - polaroidH) / 2 - 12; // 稍微向上微偏，形成經典拼貼感
 
     ctx.save();
-    // 溫和旋轉，旋轉中心設在拍立得中心
+    // 旋轉中心設在拍立得中心，旋轉角度 ~ 2.6 度
     ctx.translate(polaroidX + polaroidW / 2, polaroidY + polaroidH / 2);
-    ctx.rotate(0.025);
+    ctx.rotate(0.045);
     ctx.translate(-(polaroidX + polaroidW / 2), -(polaroidY + polaroidH / 2));
 
-    // 拍立得白色卡紙
+    // 拍立得白色厚卡紙與立體陰影
     ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = 'rgba(0,0,0,0.08)'; ctx.shadowBlur = 16; ctx.shadowOffsetY = 5;
-    drawRoundedRect(ctx, polaroidX, polaroidY, polaroidW, polaroidH, 16); ctx.fill();
+    ctx.shadowColor = 'rgba(0,0,0,0.14)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 10;
+    drawRoundedRect(ctx, polaroidX, polaroidY, polaroidW, polaroidH, 18); ctx.fill();
     ctx.shadowColor = 'transparent';
 
-    // 相片內部區域
-    const photoPad = Math.round(polaroidW * 0.055);
-    const photoW = polaroidW - photoPad * 2;
-    const photoH = polaroidH - photoPad * 2 - Math.round(polaroidH * 0.14); // 底部保留拍立得白邊
+    // 相片內部正方形區域 (大尺寸展示)
+    const photoPad = 22;
+    const photoW = polaroidW - photoPad * 2; // 346px
+    const photoH = 346; // 正方形經典照片區
     const photoX = polaroidX + photoPad;
     const photoY = polaroidY + photoPad;
     
-    ctx.fillStyle = '#f1f5f9';
-    drawRoundedRect(ctx, photoX, photoY, photoW, photoH, 8); ctx.fill();
+    ctx.fillStyle = '#f8fafc';
+    drawRoundedRect(ctx, photoX, photoY, photoW, photoH, 10); ctx.fill();
 
     if (loadedIll) {
       ctx.save();
-      drawRoundedRect(ctx, photoX, photoY, photoW, photoH, 8);
+      drawRoundedRect(ctx, photoX, photoY, photoW, photoH, 10);
       ctx.clip();
       const imgW = loadedIll.width; const imgH = loadedIll.height;
       const scale = Math.max(photoW / imgW, photoH / imgH);
@@ -211,22 +212,22 @@ export default function App() {
       ctx.drawImage(loadedIll, photoX + (photoW - drawW) / 2, photoY + (photoH - drawH) / 2, drawW, drawH);
       ctx.restore();
     } else {
-      ctx.fillStyle = '#9ca3af'; ctx.globalAlpha = 0.5; ctx.font = `700 22px ${font}`;
+      ctx.fillStyle = '#94a3b8'; ctx.globalAlpha = 0.45; ctx.font = `700 24px ${font}`;
       ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
-      ctx.fillText('上傳插圖', photoX + photoW / 2, photoY + photoH / 2);
+      ctx.fillText('📷 點擊左側上傳插圖', photoX + photoW / 2, photoY + photoH / 2);
       ctx.textAlign = 'left'; ctx.globalAlpha = 1;
     }
     
-    // 紙膠帶裝飾
-    const tapeW = Math.round(polaroidW * 0.32);
-    const tapeH = 24;
-    ctx.fillStyle = colors.tape; ctx.globalAlpha = 0.85; ctx.save();
-    ctx.translate(polaroidX + polaroidW - tapeW - 6, polaroidY - 8); ctx.rotate(0.18);
-    drawRoundedRect(ctx, 0, 0, tapeW, tapeH, 4); ctx.fill(); ctx.restore(); ctx.globalAlpha = 1;
+    // 右上角斜角紙膠帶 (亮麗吸睛)
+    const tapeW = 105;
+    const tapeH = 30;
+    ctx.fillStyle = colors.tape; ctx.globalAlpha = 0.88; ctx.save();
+    ctx.translate(polaroidX + polaroidW - 80, polaroidY - 14); ctx.rotate(0.28);
+    drawRoundedRect(ctx, 0, 0, tapeW, tapeH, 5); ctx.fill(); ctx.restore(); ctx.globalAlpha = 1;
     
-    ctx.restore(); // 恢復拍立得旋轉
+    ctx.restore(); // 結束拍立得繪製
 
-    // 7. 左側單字與翻譯排版
+    // 7. 左側單字與翻譯排版 (自動適應大拍立得寬度)
     const maxWordW = polaroidX - 110;
     ctx.font = `900 ${wordFontSize}px ${font}`;
     const wordLines: string[] = [];
@@ -239,64 +240,66 @@ export default function App() {
       }
       if (currentLine) wordLines.push(currentLine);
     }
-    const wordLineH = Math.floor(wordFontSize * 1.25);
-    const badgeH = 40; const gapBadgeWord = 14; const wordsH = wordLines.length * wordLineH;
-    const gapWordTrans = 22; const transH = 46;
+    const wordLineH = Math.floor(wordFontSize * 1.28);
+    const badgeH = 42; const gapBadgeWord = 14; const wordsH = wordLines.length * wordLineH;
+    const gapWordTrans = 24; const transH = 48;
     const totalContentH = badgeH + gapBadgeWord + wordsH + gapWordTrans + transH;
     let currentY = cardY + (cardH - totalContentH) / 2;
 
-    // 單字標籤徽章
+    // 「本日の単語」標籤徽章
     const badgeText = '本日の単語';
-    ctx.font = `900 22px ${font}`;
-    const badgeW = ctx.measureText(badgeText).width + 36;
+    ctx.font = `900 23px ${font}`;
+    const badgeW = ctx.measureText(badgeText).width + 38;
     ctx.fillStyle = colors.primary;
     drawRoundedRect(ctx, 85, currentY, badgeW, badgeH, badgeH / 2); ctx.fill();
     ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle';
-    ctx.fillText(badgeText, 103, currentY + badgeH / 2);
+    ctx.fillText(badgeText, 104, currentY + badgeH / 2);
     currentY += badgeH + gapBadgeWord;
 
-    // 日文單字文字
-    ctx.fillStyle = '#1f2937'; ctx.font = `900 ${wordFontSize}px ${font}`; ctx.textBaseline = 'top';
+    // 日文單字主體 (漢字 + 假名)
+    ctx.fillStyle = '#0f172a'; ctx.font = `900 ${wordFontSize}px ${font}`; ctx.textBaseline = 'top';
     wordLines.forEach((line, idx) => {
       ctx.fillText(line, 85, currentY + idx * wordLineH);
     });
     currentY += wordsH + gapWordTrans;
 
-    // 中文翻譯膠囊
+    // 中文翻譯黑色膠囊
     ctx.font = `700 28px ${font}`;
-    const transW = ctx.measureText(translation).width + 32;
+    const transW = ctx.measureText(translation).width + 36;
     ctx.save();
     ctx.translate(85, currentY); ctx.rotate(-0.025);
-    ctx.fillStyle = '#1f2937'; drawRoundedRect(ctx, 0, 0, transW, transH, 12); ctx.fill();
-    ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle'; ctx.fillText(translation, 16, transH / 2);
+    ctx.fillStyle = '#1e293b'; drawRoundedRect(ctx, 0, 0, transW, transH, 12); ctx.fill();
+    ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle'; ctx.fillText(translation, 18, transH / 2);
     ctx.restore();
 
-    // 8. 繪製底部例句筆記本
+    // 8. 底部例句筆記本 (微傾斜仿真手帳風格)
     ctx.save();
     ctx.translate(S / 2, noteY + noteH / 2); ctx.rotate(-0.012);
     ctx.translate(-(S / 2), -(noteY + noteH / 2));
     
     // 筆記本白底與陰影
-    ctx.fillStyle = '#ffffff'; ctx.shadowColor = 'rgba(0,0,0,0.06)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 4;
+    ctx.fillStyle = '#ffffff'; ctx.shadowColor = 'rgba(0,0,0,0.08)'; ctx.shadowBlur = 16; ctx.shadowOffsetY = 5;
     drawRoundedRect(ctx, 45, noteY, S - 90, noteH, 38); ctx.fill(); ctx.shadowColor = 'transparent';
     ctx.strokeStyle = '#f1f5f9'; ctx.lineWidth = 2.5; drawRoundedRect(ctx, 45, noteY, S - 90, noteH, 38); ctx.stroke();
     
-    // 筆記本紅色邊界線
+    // 筆記本紅色左側邊界線
     ctx.strokeStyle = '#fca5a5'; ctx.lineWidth = 2; ctx.beginPath();
     ctx.moveTo(140, noteY + 12); ctx.lineTo(140, noteY + noteH - 12); ctx.stroke();
     
     // 星星與標籤
-    ctx.fillStyle = '#FBBF24'; ctx.font = `900 24px ${font}`; ctx.textBaseline = 'top'; ctx.fillText('★', 160, noteY + 22);
+    ctx.fillStyle = '#F59E0B'; ctx.font = `900 24px ${font}`; ctx.textBaseline = 'top'; ctx.fillText('★', 160, noteY + 22);
     ctx.fillStyle = '#64748b'; ctx.font = `900 22px ${font}`; ctx.fillText('例文（例句）', 190, noteY + 24);
     
     // 繪製橫線與文字
     ctx.font = `700 ${sentenceFontSize}px ${font}`; 
     wrappedLines.forEach((line, i) => {
       const ly = noteY + noteTopPad + i * lineH;
+      // 筆記藍灰橫線
       ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1.5; ctx.beginPath();
       ctx.moveTo(160, ly + lineH); ctx.lineTo(S - 80, ly + lineH); ctx.stroke();
       
-      ctx.fillStyle = '#1e293b';
+      // 文字
+      ctx.fillStyle = '#0f172a';
       ctx.textBaseline = 'middle';
       ctx.fillText(line, 160, ly + lineH / 2);
     });
@@ -319,14 +322,14 @@ export default function App() {
     <div className="min-h-screen bg-slate-100 text-slate-800 py-4 px-3 sm:p-6 lg:p-8 flex justify-center items-start overflow-x-hidden font-sans">
       <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-6 items-center lg:items-start justify-center">
         
-        {/* 控制面板：手機版在下方或上方皆自適應滿版 */}
+        {/* 控制面板 */}
         <div className="w-full max-w-lg bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-xl flex flex-col gap-4 border border-gray-100 order-2 lg:order-1">
           <div className="flex items-center justify-between">
             <h1 className="text-lg sm:text-xl font-black text-gray-800 flex items-center gap-2">
-              <Sparkles className="text-yellow-400" size={22} />
+              <Sparkles className="text-pink-500" size={22} />
               全能彈性編輯器
             </h1>
-            <span className="text-[11px] font-bold px-2.5 py-1 bg-yellow-100 text-yellow-800 rounded-full">
+            <span className="text-[11px] font-bold px-2.5 py-1 bg-pink-100 text-pink-700 rounded-full">
               IG 1:1 貼文規格
             </span>
           </div>
@@ -353,9 +356,9 @@ export default function App() {
             </label>
             <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
               {[
-                { id: 'zen', name: '日系圓體', desc: 'Zen Maru' },
-                { id: 'noto', name: '清晰黑體', desc: 'Noto Sans' },
+                { id: 'zen', name: '日系圓體', desc: 'Zen Maru (推薦)' },
                 { id: 'mplus', name: '可愛萌圓', desc: 'M PLUS' },
+                { id: 'noto', name: '清晰黑體', desc: 'Noto Sans' },
               ].map(f => (
                 <button
                   key={f.id}
