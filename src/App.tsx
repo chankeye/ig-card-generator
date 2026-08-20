@@ -174,37 +174,37 @@ export default function App() {
     ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 3;
     drawRoundedRect(ctx, 45, cardY, S - 90, cardH, 44); ctx.stroke();
 
-    // 6. 右側大尺寸拍立得相框 (原版大器比例：寬約 390px、高約 430px，自然微突出 card 邊界，立體層次感極佳)
-    const polaroidW = 390;
-    const polaroidH = 430;
-    const polaroidX = S - 45 - polaroidW - 18;
-    const polaroidY = cardY + (cardH - polaroidH) / 2 - 12; // 稍微向上微偏，形成經典拼貼感
+    // 6. 右側大尺寸拍立得相框 (放大並微幅往左移，畫面更飽滿平衡)
+    const polaroidW = 430;
+    const polaroidH = 475;
+    const polaroidX = S - 45 - polaroidW - 52;
+    const polaroidY = cardY + (cardH - polaroidH) / 2 - 8;
 
     ctx.save();
-    // 旋轉中心設在拍立得中心，旋轉角度 ~ 2.6 度
+    // 旋轉中心設在拍立得中心，旋轉角度 ~ 2.4 度
     ctx.translate(polaroidX + polaroidW / 2, polaroidY + polaroidH / 2);
-    ctx.rotate(0.045);
+    ctx.rotate(0.042);
     ctx.translate(-(polaroidX + polaroidW / 2), -(polaroidY + polaroidH / 2));
 
     // 拍立得白色厚卡紙與立體陰影
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(0,0,0,0.14)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 10;
-    drawRoundedRect(ctx, polaroidX, polaroidY, polaroidW, polaroidH, 18); ctx.fill();
+    drawRoundedRect(ctx, polaroidX, polaroidY, polaroidW, polaroidH, 20); ctx.fill();
     ctx.shadowColor = 'transparent';
 
     // 相片內部正方形區域 (大尺寸展示)
     const photoPad = 22;
-    const photoW = polaroidW - photoPad * 2; // 346px
-    const photoH = 346; // 正方形經典照片區
+    const photoW = polaroidW - photoPad * 2; // 386px
+    const photoH = 386; // 正方形經典照片區
     const photoX = polaroidX + photoPad;
     const photoY = polaroidY + photoPad;
     
     ctx.fillStyle = '#f8fafc';
-    drawRoundedRect(ctx, photoX, photoY, photoW, photoH, 10); ctx.fill();
+    drawRoundedRect(ctx, photoX, photoY, photoW, photoH, 12); ctx.fill();
 
     if (loadedIll) {
       ctx.save();
-      drawRoundedRect(ctx, photoX, photoY, photoW, photoH, 10);
+      drawRoundedRect(ctx, photoX, photoY, photoW, photoH, 12);
       ctx.clip();
       const imgW = loadedIll.width; const imgH = loadedIll.height;
       const scale = Math.max(photoW / imgW, photoH / imgH);
@@ -212,17 +212,17 @@ export default function App() {
       ctx.drawImage(loadedIll, photoX + (photoW - drawW) / 2, photoY + (photoH - drawH) / 2, drawW, drawH);
       ctx.restore();
     } else {
-      ctx.fillStyle = '#94a3b8'; ctx.globalAlpha = 0.45; ctx.font = `700 24px ${font}`;
+      ctx.fillStyle = '#94a3b8'; ctx.globalAlpha = 0.45; ctx.font = `700 25px ${font}`;
       ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
       ctx.fillText('📷 點擊左側上傳插圖', photoX + photoW / 2, photoY + photoH / 2);
       ctx.textAlign = 'left'; ctx.globalAlpha = 1;
     }
     
     // 右上角斜角紙膠帶 (亮麗吸睛)
-    const tapeW = 105;
-    const tapeH = 30;
+    const tapeW = 115;
+    const tapeH = 32;
     ctx.fillStyle = colors.tape; ctx.globalAlpha = 0.88; ctx.save();
-    ctx.translate(polaroidX + polaroidW - 80, polaroidY - 14); ctx.rotate(0.28);
+    ctx.translate(polaroidX + polaroidW - 90, polaroidY - 14); ctx.rotate(0.28);
     drawRoundedRect(ctx, 0, 0, tapeW, tapeH, 5); ctx.fill(); ctx.restore(); ctx.globalAlpha = 1;
     
     ctx.restore(); // 結束拍立得繪製
