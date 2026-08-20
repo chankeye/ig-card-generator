@@ -1,23 +1,32 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Camera, Download, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { Camera, Download, Image as ImageIcon, Sparkles, Type } from 'lucide-react';
 
 export default function App() {
   const [word, setWord] = useState('引きこもり\n(引きこもり)');
   const [translation, setTranslation] = useState('宅在家、不出門的人');
   const [sentenceJP, setSentenceJP] = useState('連休は一歩も外に出ず、完全な引きこもり生活を送りました。\n連休は一歩も外に出ず、完全な引きこもり生活を送りました。'); 
   const [themeColor, setThemeColor] = useState('yellow');
+  const [fontChoice, setFontChoice] = useState<'zen' | 'noto' | 'mplus'>('zen');
   
   // 字體大小控制
   const [wordFontSize, setWordFontSize] = useState(56);
-  const [sentenceFontSize, setSentenceFontSize] = useState(46); // 預設字體大小改為 46
+  const [sentenceFontSize, setSentenceFontSize] = useState(44);
   
   const [avatarImage, setAvatarImage] = useState<string | null>(null);
   const [illustrationImage, setIllustrationImage] = useState<string | null>(null);
 
   const [loadedAvatar, setLoadedAvatar] = useState<HTMLImageElement | null>(null);
   const [loadedIll, setLoadedIll] = useState<HTMLImageElement | null>(null);
+  const [fontsLoaded, setFontsLoaded] = useState(false);
   
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // 監聽 Web Fonts 載入完成，觸發 Canvas 重新繪製
+  useEffect(() => {
+    document.fonts.ready.then(() => {
+      setFontsLoaded(true);
+    });
+  }, []);
 
   // 預載圖片以確保 Canvas 能同步渲染
   useEffect(() => {
@@ -61,6 +70,12 @@ export default function App() {
     mint: { bg: '#F0FDF4', primary: '#4ADE80', secondary: '#BBF7D0', tape: '#F472B6' },
   };
 
+  const fontFamilies = {
+    zen: '"Zen Maru Gothic", "Noto Sans JP", "Noto Sans TC", sans-serif',
+    noto: '"Noto Sans JP", "Noto Sans TC", "Microsoft JhengHei", sans-serif',
+    mplus: '"M PLUS Rounded 1c", "Zen Maru Gothic", sans-serif',
+  };
+
   const drawRoundedRect = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
@@ -83,84 +98,137 @@ export default function App() {
     if (!ctx) return;
     const S = 1080;
     const colors = themeColors[themeColor] || themeColors.yellow;
-    const font = '"Noto Sans JP", "Noto Sans TC", "Microsoft JhengHei", "Yu Gothic", "Meiryo", sans-serif';
+    const font = fontFamilies[fontChoice] || fontFamilies.zen;
 
-    // 1. 清空與背景
+    // 1. 清空與圓角背景
     ctx.clearRect(0, 0, S, S);
     ctx.fillStyle = colors.bg;
     drawRoundedRect(ctx, 0, 0, S, S, 60);
     ctx.fill();
 
-    // 2. 裝飾圓形
-    ctx.globalAlpha = 0.3;
+    // 2. 裝飾圓形（日系粉彩漸層點綴）
+    ctx.globalAlpha = 0.35;
     ctx.fillStyle = colors.secondary;
     ctx.beginPath(); ctx.arc(S * 0.85, S * 0.05, S * 0.28, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(S * 0.1, S * 0.95, S * 0.32, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(S * 0.08, S * 0.95, S * 0.32, 0, Math.PI * 2); ctx.fill();
     ctx.globalAlpha = 1;
 
-    // 3. Header: 大頭照 + 標題
-    const headerY = 70;
+    // 3. Header: 大頭照 + 頻道名稱
+    const headerY = 65;
     ctx.save();
-    ctx.beginPath(); ctx.arc(110, headerY + 60, 60, 0, Math.PI * 2);
+    ctx.beginPath(); ctx.arc(110, headerY + 56, 56, 0, Math.PI * 2);
     ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = 'rgba(0,0,0,0.1)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 3;
+    ctx.shadowColor = 'rgba(0,0,0,0.08)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4;
     ctx.fill();
     ctx.shadowColor = 'transparent';
     
-    ctx.beginPath(); ctx.arc(110, headerY + 60, 54, 0, Math.PI * 2); ctx.clip();
+    ctx.beginPath(); ctx.arc(110, headerY + 56, 50, 0, Math.PI * 2); ctx.clip();
     if (loadedAvatar) {
       const imgW = loadedAvatar.width; const imgH = loadedAvatar.height;
-      const scale = Math.max(108 / imgW, 108 / imgH);
+      const scale = Math.max(100 / imgW, 100 / imgH);
       const drawW = imgW * scale; const drawH = imgH * scale;
-      ctx.drawImage(loadedAvatar, 110 - drawW / 2, headerY + 60 - drawH / 2, drawW, drawH);
+      ctx.drawImage(loadedAvatar, 110 - drawW / 2, headerY + 56 - drawH / 2, drawW, drawH);
     } else {
-      ctx.fillStyle = '#FEF3C7'; ctx.fillRect(56, headerY + 6, 108, 108);
-      ctx.fillStyle = '#D97706'; ctx.font = `900 48px ${font}`;
+      ctx.fillStyle = colors.secondary; ctx.fillRect(60, headerY + 6, 100, 100);
+      ctx.fillStyle = '#1f2937'; ctx.font = `900 44px ${font}`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('吉', 110, headerY + 60);
+      ctx.fillText('吉', 110, headerY + 56);
       ctx.textAlign = 'left';
     }
     ctx.restore();
 
     ctx.fillStyle = '#1f2937'; ctx.font = `900 44px ${font}`; ctx.textBaseline = 'middle';
-    ctx.fillText('吉武的日文小教室', 185, headerY + 45);
+    ctx.fillText('吉武的日文小教室', 185, headerY + 42);
     ctx.fillStyle = '#6b7280'; ctx.font = `700 20px ${font}`;
-    ctx.fillText('@languagetrailsfree', 185, headerY + 82);
+    ctx.fillText('@languagetrailsfree', 185, headerY + 78);
 
     // 4. 計算例句區域高度 (動態伸縮)
     ctx.font = `700 ${sentenceFontSize}px ${font}`;
-    let _lc = 0;
-    const maxNoteTextW = 820;
+    const maxNoteTextW = 810;
     const wrappedLines: string[] = [];
     for (const oLine of sentenceJP.split('\n')) {
-      if (oLine === '') { wrappedLines.push(''); _lc++; continue; }
+      if (oLine === '') { wrappedLines.push(''); continue; }
       let currentLine = '';
       for (const char of oLine) {
         if (ctx.measureText(currentLine + char).width > maxNoteTextW && currentLine.length > 0) {
-          wrappedLines.push(currentLine); currentLine = char; _lc++;
+          wrappedLines.push(currentLine); currentLine = char;
         } else { currentLine += char; }
       }
-      if (currentLine) { wrappedLines.push(currentLine); _lc++; }
+      if (currentLine) { wrappedLines.push(currentLine); }
     }
     
-    const noteTopPad = 70; 
-    const noteBotPad = 40; 
-    // 行高依據字體大小動態調整 (大約 1.6 倍)
+    const lineCount = Math.max(2, wrappedLines.length);
+    const noteTopPad = 72; 
+    const noteBotPad = 32; 
     const lineH = Math.floor(sentenceFontSize * 1.6);
-    const noteH = noteTopPad + _lc * lineH + noteBotPad;
-    const noteY = S - noteH - 40; 
+    const noteH = noteTopPad + lineCount * lineH + noteBotPad;
+    const noteY = S - noteH - 45; 
 
     // 5. 中間單字卡區域
-    const cardY = 250;
-    const cardH = noteY - cardY - 32; 
-    ctx.fillStyle = 'rgba(255,255,255,0.8)';
-    drawRoundedRect(ctx, 50, cardY, S - 100, cardH, 50); ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 3;
-    drawRoundedRect(ctx, 50, cardY, S - 100, cardH, 50); ctx.stroke();
+    const cardY = 220;
+    const cardH = noteY - cardY - 26; 
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    drawRoundedRect(ctx, 45, cardY, S - 90, cardH, 44); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 3;
+    drawRoundedRect(ctx, 45, cardY, S - 90, cardH, 44); ctx.stroke();
 
-    // 6. 單字與翻譯排版
+    // 6. 右側拍立得相框 (動態依 cardH 調整大小，確保完美收納於卡片內)
+    const targetPolaroidH = Math.min(360, Math.max(240, cardH - 40));
+    const polaroidH = targetPolaroidH;
+    const polaroidW = Math.round(polaroidH * 0.88);
+    const polaroidX = S - 45 - polaroidW - 32;
+    const polaroidY = cardY + (cardH - polaroidH) / 2;
+
+    ctx.save();
+    // 溫和旋轉，旋轉中心設在拍立得中心
+    ctx.translate(polaroidX + polaroidW / 2, polaroidY + polaroidH / 2);
+    ctx.rotate(0.025);
+    ctx.translate(-(polaroidX + polaroidW / 2), -(polaroidY + polaroidH / 2));
+
+    // 拍立得白色卡紙
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(0,0,0,0.08)'; ctx.shadowBlur = 16; ctx.shadowOffsetY = 5;
+    drawRoundedRect(ctx, polaroidX, polaroidY, polaroidW, polaroidH, 16); ctx.fill();
+    ctx.shadowColor = 'transparent';
+
+    // 相片內部區域
+    const photoPad = Math.round(polaroidW * 0.055);
+    const photoW = polaroidW - photoPad * 2;
+    const photoH = polaroidH - photoPad * 2 - Math.round(polaroidH * 0.14); // 底部保留拍立得經典白邊
+    const photoX = polaroidX + photoPad;
+    const photoY = polaroidY + photoPad;
+    
+    ctx.fillStyle = '#f1f5f9';
+    drawRoundedRect(ctx, photoX, photoY, photoW, photoH, 8); ctx.fill();
+
+    if (loadedIll) {
+      ctx.save();
+      drawRoundedRect(ctx, photoX, photoY, photoW, photoH, 8);
+      ctx.clip();
+      const imgW = loadedIll.width; const imgH = loadedIll.height;
+      const scale = Math.max(photoW / imgW, photoH / imgH);
+      const drawW = imgW * scale; const drawH = imgH * scale;
+      ctx.drawImage(loadedIll, photoX + (photoW - drawW) / 2, photoY + (photoH - drawH) / 2, drawW, drawH);
+      ctx.restore();
+    } else {
+      ctx.fillStyle = '#9ca3af'; ctx.globalAlpha = 0.5; ctx.font = `700 22px ${font}`;
+      ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+      ctx.fillText('上傳插圖', photoX + photoW / 2, photoY + photoH / 2);
+      ctx.textAlign = 'left'; ctx.globalAlpha = 1;
+    }
+    
+    // 紙膠帶裝飾（固定在拍立得右上角內側，不會超出主卡片）
+    const tapeW = Math.round(polaroidW * 0.32);
+    const tapeH = 24;
+    ctx.fillStyle = colors.tape; ctx.globalAlpha = 0.85; ctx.save();
+    ctx.translate(polaroidX + polaroidW - tapeW - 6, polaroidY - 8); ctx.rotate(0.18);
+    drawRoundedRect(ctx, 0, 0, tapeW, tapeH, 4); ctx.fill(); ctx.restore(); ctx.globalAlpha = 1;
+    
+    ctx.restore(); // 恢復拍立得旋轉
+
+    // 7. 左側單字與翻譯排版（動態寬度與垂直居中）
+    const maxWordW = polaroidX - 110;
     ctx.font = `900 ${wordFontSize}px ${font}`;
-    const maxWordW = 460;
     const wordLines: string[] = [];
     for (const wLine of word.split('\n')) {
       let currentLine = '';
@@ -172,109 +240,71 @@ export default function App() {
       if (currentLine) wordLines.push(currentLine);
     }
     const wordLineH = Math.floor(wordFontSize * 1.25);
-    const badgeH = 42; const gapBadgeWord = 13; const wordsH = wordLines.length * wordLineH;
-    const gapWordTrans = 25; const transH = 46;
+    const badgeH = 40; const gapBadgeWord = 14; const wordsH = wordLines.length * wordLineH;
+    const gapWordTrans = 22; const transH = 46;
     const totalContentH = badgeH + gapBadgeWord + wordsH + gapWordTrans + transH;
     let currentY = cardY + (cardH - totalContentH) / 2;
 
-    // 單字徽章
+    // 單字標籤徽章
     const badgeText = '本日の単語';
-    ctx.font = `900 24px ${font}`;
+    ctx.font = `900 22px ${font}`;
     const badgeW = ctx.measureText(badgeText).width + 36;
     ctx.fillStyle = colors.primary;
-    drawRoundedRect(ctx, 90, currentY, badgeW, badgeH, badgeH / 2); ctx.fill();
+    drawRoundedRect(ctx, 85, currentY, badgeW, badgeH, badgeH / 2); ctx.fill();
     ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle';
-    ctx.fillText(badgeText, 108, currentY + badgeH / 2);
+    ctx.fillText(badgeText, 103, currentY + badgeH / 2);
     currentY += badgeH + gapBadgeWord;
 
-    // 日文單字
+    // 日文單字文字
     ctx.fillStyle = '#1f2937'; ctx.font = `900 ${wordFontSize}px ${font}`; ctx.textBaseline = 'top';
     wordLines.forEach((line, idx) => {
-      ctx.fillText(line, 90, currentY + idx * wordLineH);
+      ctx.fillText(line, 85, currentY + idx * wordLineH);
     });
     currentY += wordsH + gapWordTrans;
 
-    // 中文翻譯
+    // 中文翻譯膠囊
     ctx.font = `700 28px ${font}`;
     const transW = ctx.measureText(translation).width + 32;
     ctx.save();
-    ctx.translate(95, currentY); ctx.rotate(-0.03);
+    ctx.translate(85, currentY); ctx.rotate(-0.025);
     ctx.fillStyle = '#1f2937'; drawRoundedRect(ctx, 0, 0, transW, transH, 12); ctx.fill();
     ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle'; ctx.fillText(translation, 16, transH / 2);
     ctx.restore();
 
-    // 7. 右側拍立得相框 (插圖)
-    const polaroidW = 340; const polaroidH = 370;
-    const polaroidX = S - 50 - polaroidW - 40;
-    const polaroidY = cardY + (cardH - polaroidH) / 2;
-
-    ctx.save();
-    ctx.translate(polaroidX + polaroidW / 2, polaroidY + polaroidH / 2);
-    ctx.rotate(0.04);
-    ctx.translate(-(polaroidX + polaroidW / 2), -(polaroidY + polaroidH / 2));
-
-    ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = 'rgba(0,0,0,0.12)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 6;
-    drawRoundedRect(ctx, polaroidX, polaroidY, polaroidW, polaroidH, 16); ctx.fill();
-    ctx.shadowColor = 'transparent';
-
-    const photoPad = 18; const photoW = polaroidW - photoPad * 2; const photoS = photoW;
-    const photoX = polaroidX + photoPad; const photoY = polaroidY + photoPad;
-    
-    ctx.fillStyle = '#f8fafc'; drawRoundedRect(ctx, photoX, photoY, photoS, photoS, 8); ctx.fill();
-
-    if (loadedIll) {
-      ctx.save();
-      drawRoundedRect(ctx, photoX, photoY, photoS, photoS, 8);
-      ctx.clip();
-      const imgW = loadedIll.width; const imgH = loadedIll.height;
-      const scale = Math.max(photoS / imgW, photoS / imgH);
-      const drawW = imgW * scale; const drawH = imgH * scale;
-      ctx.drawImage(loadedIll, photoX + (photoS - drawW) / 2, photoY + (photoS - drawH) / 2, drawW, drawH);
-      ctx.restore();
-    } else {
-      ctx.fillStyle = '#9ca3af'; ctx.globalAlpha = 0.4; ctx.font = `700 22px ${font}`;
-      ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
-      ctx.fillText('上傳插圖', photoX + photoS / 2, photoY + photoS / 2);
-      ctx.textAlign = 'left'; ctx.globalAlpha = 1;
-    }
-    
-    // 膠帶
-    ctx.fillStyle = colors.tape; ctx.globalAlpha = 0.8; ctx.save();
-    ctx.translate(polaroidX + polaroidW - 75, polaroidY - 15); ctx.rotate(0.26);
-    drawRoundedRect(ctx, 0, 0, 96, 26, 4); ctx.fill(); ctx.restore(); ctx.globalAlpha = 1; ctx.restore();
-
     // 8. 繪製底部例句筆記本
     ctx.save();
-    ctx.translate(S / 2, noteY + noteH / 2); ctx.rotate(-0.015);
+    ctx.translate(S / 2, noteY + noteH / 2); ctx.rotate(-0.012);
     ctx.translate(-(S / 2), -(noteY + noteH / 2));
-    ctx.fillStyle = '#ffffff'; ctx.shadowColor = 'rgba(0,0,0,0.08)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4;
-    drawRoundedRect(ctx, 50, noteY, S - 100, noteH, 40); ctx.fill(); ctx.shadowColor = 'transparent';
-    ctx.strokeStyle = '#f3f4f6'; ctx.lineWidth = 3; drawRoundedRect(ctx, 50, noteY, S - 100, noteH, 40); ctx.stroke();
     
-    ctx.strokeStyle = '#fee2e2'; ctx.lineWidth = 2; ctx.beginPath();
-    ctx.moveTo(145, noteY + 10); ctx.lineTo(145, noteY + noteH - 10); ctx.stroke();
+    // 筆記本白底與陰影
+    ctx.fillStyle = '#ffffff'; ctx.shadowColor = 'rgba(0,0,0,0.06)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 4;
+    drawRoundedRect(ctx, 45, noteY, S - 90, noteH, 38); ctx.fill(); ctx.shadowColor = 'transparent';
+    ctx.strokeStyle = '#f1f5f9'; ctx.lineWidth = 2.5; drawRoundedRect(ctx, 45, noteY, S - 90, noteH, 38); ctx.stroke();
+    
+    // 筆記本紅色左側邊界線
+    ctx.strokeStyle = '#fca5a5'; ctx.lineWidth = 2; ctx.beginPath();
+    ctx.moveTo(140, noteY + 12); ctx.lineTo(140, noteY + noteH - 12); ctx.stroke();
     
     // 星星與標籤
-    ctx.fillStyle = '#FBBF24'; ctx.font = `900 24px ${font}`; ctx.textBaseline = 'top'; ctx.fillText('★', 165, noteY + 22);
-    ctx.fillStyle = '#6b7280'; ctx.font = `900 22px ${font}`; ctx.fillText('例文（例句）', 195, noteY + 24);
+    ctx.fillStyle = '#FBBF24'; ctx.font = `900 24px ${font}`; ctx.textBaseline = 'top'; ctx.fillText('★', 160, noteY + 22);
+    ctx.fillStyle = '#64748b'; ctx.font = `900 22px ${font}`; ctx.fillText('例文（例句）', 190, noteY + 24);
     
-    // 繪製橫線與文字
+    // 繪製橫線與文字（透過 middle 對齊，確保文字平穩居中於筆記橫線上）
     ctx.font = `700 ${sentenceFontSize}px ${font}`; 
-    ctx.fillStyle = '#1f2937'; ctx.textBaseline = 'top';
     wrappedLines.forEach((line, i) => {
       const ly = noteY + noteTopPad + i * lineH;
-      // 畫線
-      ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 2; ctx.beginPath();
-      ctx.moveTo(165, ly + lineH - 2); ctx.lineTo(S - 90, ly + lineH - 2); ctx.stroke();
+      // 筆記藍灰橫線
+      ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1.5; ctx.beginPath();
+      ctx.moveTo(160, ly + lineH); ctx.lineTo(S - 80, ly + lineH); ctx.stroke();
       
-      // 動態計算文字 Y 軸偏移，讓文字永遠完美對齊在橫線上方
-      const textOffset = Math.floor((lineH - sentenceFontSize) / 2) - 2;
-      ctx.fillStyle = '#1f2937'; ctx.fillText(line, 165, ly + textOffset);
+      // 文字垂直居中對齊於橫線上方
+      ctx.fillStyle = '#1e293b';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(line, 160, ly + lineH / 2);
     });
     ctx.restore();
 
-  }, [word, translation, sentenceJP, themeColor, loadedAvatar, loadedIll, wordFontSize, sentenceFontSize]);
+  }, [word, translation, sentenceJP, themeColor, fontChoice, fontsLoaded, loadedAvatar, loadedIll, wordFontSize, sentenceFontSize]);
 
   // 瞬間下載
   const handleDownload = () => {
@@ -309,6 +339,35 @@ export default function App() {
             <span className="text-sm font-bold">上傳單字插圖</span>
             <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setIllustrationImage)} className="hidden" />
           </label>
+        </div>
+
+        {/* 字體風格選擇 */}
+        <div>
+          <label className="block text-sm font-bold text-gray-700 mb-1.5 flex items-center gap-1.5">
+            <Type size={16} className="text-gray-500" />
+            日文字體風格
+          </label>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { id: 'zen', name: '日系圓體', desc: 'Zen Maru (推薦)' },
+              { id: 'noto', name: '清晰黑體', desc: 'Noto Sans' },
+              { id: 'mplus', name: '可愛萌圓', desc: 'M PLUS' },
+            ].map(f => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setFontChoice(f.id as any)}
+                className={`p-2.5 rounded-xl border-2 text-center transition-all ${
+                  fontChoice === f.id
+                    ? 'border-gray-800 bg-gray-900 text-white shadow-sm'
+                    : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <div className="text-xs font-bold">{f.name}</div>
+                <div className={`text-[10px] mt-0.5 ${fontChoice === f.id ? 'text-gray-300' : 'text-gray-400'}`}>{f.desc}</div>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* 顏色與字體大小 */}
@@ -368,7 +427,7 @@ export default function App() {
           className="w-full mt-1 bg-gray-900 hover:bg-black text-white rounded-xl p-3.5 font-black flex items-center justify-center gap-2 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
         >
           <Download size={20} />
-          一鍵下載為 IG 貼文 (光速版)
+          一鍵下載為 IG 貼文 (高畫質)
         </button>
       </div>
 
