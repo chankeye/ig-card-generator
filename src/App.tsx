@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Camera, Download, Image as ImageIcon, Sparkles, Type } from 'lucide-react';
+import { Camera, Download, Image as ImageIcon, Sparkles, Type, Eye } from 'lucide-react';
 
 export default function App() {
   const [word, setWord] = useState('引きこもり\n(引きこもり)');
@@ -194,7 +194,7 @@ export default function App() {
     // 相片內部區域
     const photoPad = Math.round(polaroidW * 0.055);
     const photoW = polaroidW - photoPad * 2;
-    const photoH = polaroidH - photoPad * 2 - Math.round(polaroidH * 0.14); // 底部保留拍立得經典白邊
+    const photoH = polaroidH - photoPad * 2 - Math.round(polaroidH * 0.14); // 底部保留拍立得白邊
     const photoX = polaroidX + photoPad;
     const photoY = polaroidY + photoPad;
     
@@ -217,7 +217,7 @@ export default function App() {
       ctx.textAlign = 'left'; ctx.globalAlpha = 1;
     }
     
-    // 紙膠帶裝飾（固定在拍立得右上角內側，不會超出主卡片）
+    // 紙膠帶裝飾
     const tapeW = Math.round(polaroidW * 0.32);
     const tapeH = 24;
     ctx.fillStyle = colors.tape; ctx.globalAlpha = 0.85; ctx.save();
@@ -226,7 +226,7 @@ export default function App() {
     
     ctx.restore(); // 恢復拍立得旋轉
 
-    // 7. 左側單字與翻譯排版（動態寬度與垂直居中）
+    // 7. 左側單字與翻譯排版
     const maxWordW = polaroidX - 110;
     ctx.font = `900 ${wordFontSize}px ${font}`;
     const wordLines: string[] = [];
@@ -281,7 +281,7 @@ export default function App() {
     drawRoundedRect(ctx, 45, noteY, S - 90, noteH, 38); ctx.fill(); ctx.shadowColor = 'transparent';
     ctx.strokeStyle = '#f1f5f9'; ctx.lineWidth = 2.5; drawRoundedRect(ctx, 45, noteY, S - 90, noteH, 38); ctx.stroke();
     
-    // 筆記本紅色左側邊界線
+    // 筆記本紅色邊界線
     ctx.strokeStyle = '#fca5a5'; ctx.lineWidth = 2; ctx.beginPath();
     ctx.moveTo(140, noteY + 12); ctx.lineTo(140, noteY + noteH - 12); ctx.stroke();
     
@@ -289,15 +289,13 @@ export default function App() {
     ctx.fillStyle = '#FBBF24'; ctx.font = `900 24px ${font}`; ctx.textBaseline = 'top'; ctx.fillText('★', 160, noteY + 22);
     ctx.fillStyle = '#64748b'; ctx.font = `900 22px ${font}`; ctx.fillText('例文（例句）', 190, noteY + 24);
     
-    // 繪製橫線與文字（透過 middle 對齊，確保文字平穩居中於筆記橫線上）
+    // 繪製橫線與文字
     ctx.font = `700 ${sentenceFontSize}px ${font}`; 
     wrappedLines.forEach((line, i) => {
       const ly = noteY + noteTopPad + i * lineH;
-      // 筆記藍灰橫線
       ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1.5; ctx.beginPath();
       ctx.moveTo(160, ly + lineH); ctx.lineTo(S - 80, ly + lineH); ctx.stroke();
       
-      // 文字垂直居中對齊於橫線上方
       ctx.fillStyle = '#1e293b';
       ctx.textBaseline = 'middle';
       ctx.fillText(line, 160, ly + lineH / 2);
@@ -318,131 +316,146 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col lg:flex-row p-4 md:p-8 gap-6 justify-center items-center font-sans">
-      
-      {/* 左側：控制面板 */}
-      <div className="w-full max-w-md bg-white p-6 rounded-3xl shadow-xl flex flex-col gap-4 border border-gray-100">
-        <h2 className="text-xl font-black text-gray-800 flex items-center gap-2 mb-1">
-          <Sparkles className="text-yellow-400" />
-          全能彈性編輯器
-        </h2>
+    <div className="min-h-screen bg-slate-100 text-slate-800 py-4 px-3 sm:p-6 lg:p-8 flex justify-center items-start overflow-x-hidden font-sans">
+      <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-6 items-center lg:items-start justify-center">
         
-        {/* 上傳按鈕區 */}
-        <div className="grid grid-cols-2 gap-3">
-          <label className="cursor-pointer bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 rounded-xl p-3 flex flex-col items-center justify-center gap-1 transition-colors shadow-sm text-center">
-            <Camera size={20} />
-            <span className="text-sm font-bold">預覽大頭照</span>
-            <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setAvatarImage)} className="hidden" />
-          </label>
-          <label className="cursor-pointer bg-pink-50 hover:bg-pink-100 border border-pink-200 text-pink-700 rounded-xl p-3 flex flex-col items-center justify-center gap-1 transition-colors shadow-sm text-center">
-            <ImageIcon size={20} />
-            <span className="text-sm font-bold">上傳單字插圖</span>
-            <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setIllustrationImage)} className="hidden" />
-          </label>
-        </div>
-
-        {/* 字體風格選擇 */}
-        <div>
-          <label className="block text-sm font-bold text-gray-700 mb-1.5 flex items-center gap-1.5">
-            <Type size={16} className="text-gray-500" />
-            日文字體風格
-          </label>
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { id: 'zen', name: '日系圓體', desc: 'Zen Maru (推薦)' },
-              { id: 'noto', name: '清晰黑體', desc: 'Noto Sans' },
-              { id: 'mplus', name: '可愛萌圓', desc: 'M PLUS' },
-            ].map(f => (
-              <button
-                key={f.id}
-                type="button"
-                onClick={() => setFontChoice(f.id as any)}
-                className={`p-2.5 rounded-xl border-2 text-center transition-all ${
-                  fontChoice === f.id
-                    ? 'border-gray-800 bg-gray-900 text-white shadow-sm'
-                    : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <div className="text-xs font-bold">{f.name}</div>
-                <div className={`text-[10px] mt-0.5 ${fontChoice === f.id ? 'text-gray-300' : 'text-gray-400'}`}>{f.desc}</div>
-              </button>
-            ))}
+        {/* 控制面板：手機版在下方或上方皆自適應滿版 */}
+        <div className="w-full max-w-lg bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-xl flex flex-col gap-4 border border-gray-100 order-2 lg:order-1">
+          <div className="flex items-center justify-between">
+            <h1 className="text-lg sm:text-xl font-black text-gray-800 flex items-center gap-2">
+              <Sparkles className="text-yellow-400" size={22} />
+              全能彈性編輯器
+            </h1>
+            <span className="text-[11px] font-bold px-2.5 py-1 bg-yellow-100 text-yellow-800 rounded-full">
+              IG 1:1 貼文規格
+            </span>
           </div>
-        </div>
+          
+          {/* 上傳按鈕區 */}
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
+            <label className="cursor-pointer bg-blue-50 hover:bg-blue-100 active:scale-95 border border-blue-200 text-blue-700 rounded-xl p-2.5 sm:p-3 flex flex-col items-center justify-center gap-1 transition-all shadow-sm text-center">
+              <Camera size={18} />
+              <span className="text-xs sm:text-sm font-bold">預覽大頭照</span>
+              <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setAvatarImage)} className="hidden" />
+            </label>
+            <label className="cursor-pointer bg-pink-50 hover:bg-pink-100 active:scale-95 border border-pink-200 text-pink-700 rounded-xl p-2.5 sm:p-3 flex flex-col items-center justify-center gap-1 transition-all shadow-sm text-center">
+              <ImageIcon size={18} />
+              <span className="text-xs sm:text-sm font-bold">上傳單字插圖</span>
+              <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setIllustrationImage)} className="hidden" />
+            </label>
+          </div>
 
-        {/* 顏色與字體大小 */}
-        <div className="grid grid-cols-2 gap-4 items-end">
+          {/* 字體風格選擇 */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">背景主題色</label>
-            <div className="flex gap-2">
-              {Object.keys(themeColors).map(color => (
+            <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5 flex items-center gap-1.5">
+              <Type size={15} className="text-gray-500" />
+              日文字體風格
+            </label>
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+              {[
+                { id: 'zen', name: '日系圓體', desc: 'Zen Maru' },
+                { id: 'noto', name: '清晰黑體', desc: 'Noto Sans' },
+                { id: 'mplus', name: '可愛萌圓', desc: 'M PLUS' },
+              ].map(f => (
                 <button
-                  key={color}
+                  key={f.id}
                   type="button"
-                  onClick={() => setThemeColor(color)}
-                  className={`w-8 h-8 rounded-full shadow-sm transition-all border-2 ${themeColor === color ? 'border-gray-800 scale-110' : 'border-transparent'}`}
-                  style={{ backgroundColor: themeColors[color].primary }}
-                />
+                  onClick={() => setFontChoice(f.id as any)}
+                  className={`p-2 rounded-xl border-2 text-center transition-all ${
+                    fontChoice === f.id
+                      ? 'border-gray-800 bg-gray-900 text-white shadow-sm'
+                      : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="text-xs font-bold leading-tight">{f.name}</div>
+                  <div className={`text-[10px] mt-0.5 ${fontChoice === f.id ? 'text-gray-300' : 'text-gray-400'}`}>{f.desc}</div>
+                </button>
               ))}
             </div>
           </div>
-          <div>
-            <div className="flex justify-between items-center mb-1">
-              <label className="text-sm font-bold text-gray-700">單字大小</label>
-              <span className="text-xs text-gray-500 font-bold">{wordFontSize}px</span>
+
+          {/* 顏色與單字字體大小 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 items-end bg-slate-50 p-3 rounded-xl border border-slate-100">
+            <div>
+              <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5">背景主題色</label>
+              <div className="flex gap-2">
+                {Object.keys(themeColors).map(color => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => setThemeColor(color)}
+                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full shadow-sm transition-all border-2 ${themeColor === color ? 'border-gray-800 scale-110' : 'border-transparent'}`}
+                    style={{ backgroundColor: themeColors[color].primary }}
+                    aria-label={`選擇 ${color} 主題色`}
+                  />
+                ))}
+              </div>
             </div>
-            <input type="range" min="36" max="96" value={wordFontSize} onChange={e => setWordFontSize(Number(e.target.value))} className="w-full accent-gray-800" />
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <label className="text-xs sm:text-sm font-bold text-gray-700">單字大小</label>
+                <span className="text-xs text-gray-500 font-bold">{wordFontSize}px</span>
+              </div>
+              <input type="range" min="36" max="96" value={wordFontSize} onChange={e => setWordFontSize(Number(e.target.value))} className="w-full accent-gray-800" />
+            </div>
+          </div>
+
+          {/* 例句大小 */}
+          <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-xs sm:text-sm font-bold text-gray-700">例句字體大小</label>
+              <span className="text-xs text-gray-500 font-bold">{sentenceFontSize}px</span>
+            </div>
+            <input type="range" min="24" max="64" value={sentenceFontSize} onChange={e => setSentenceFontSize(Number(e.target.value))} className="w-full accent-gray-800" />
+          </div>
+
+          {/* 文字輸入 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-1">日文單字</label>
+              <textarea value={word} onChange={e => setWord(e.target.value)} rows={2} className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl p-2.5 font-bold focus:border-blue-400 focus:bg-white outline-none resize-none leading-relaxed transition-colors text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-1">中文翻譯</label>
+              <input type="text" value={translation} onChange={e => setTranslation(e.target.value)} className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl p-2.5 font-bold focus:border-blue-400 focus:bg-white outline-none transition-colors text-sm" />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-1">日文例句</label>
+            <textarea value={sentenceJP} onChange={e => setSentenceJP(e.target.value)} rows={3} className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl p-2.5 font-bold focus:border-blue-400 focus:bg-white outline-none resize-none leading-relaxed transition-colors text-sm" />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="w-full mt-1 bg-gray-900 hover:bg-black active:scale-[0.98] text-white rounded-xl p-3 sm:p-3.5 font-black flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl"
+          >
+            <Download size={19} />
+            一鍵下載為 IG 貼文 (1080x1080)
+          </button>
+        </div>
+
+        {/* 右側（手機版在上方）：自適應縮放 Canvas 預覽區 */}
+        <div className="w-full max-w-lg flex flex-col items-center gap-2 order-1 lg:order-2">
+          <div className="w-full flex items-center justify-between px-1">
+            <span className="text-xs font-bold text-gray-500 flex items-center gap-1">
+              <Eye size={14} /> 即時畫布預覽
+            </span>
+            <span className="text-[11px] font-semibold text-gray-400">1080 × 1080 px</span>
+          </div>
+          
+          <div className="w-full aspect-square bg-gray-200 rounded-2xl sm:rounded-[2rem] overflow-hidden shadow-2xl border-4 sm:border-[6px] border-white relative flex items-center justify-center">
+            <canvas 
+              ref={canvasRef} 
+              width={1080} 
+              height={1080} 
+              className="w-full h-full object-contain block" 
+            />
           </div>
         </div>
 
-        {/* 例句大小 */}
-        <div>
-          <div className="flex justify-between items-center mb-1">
-            <label className="text-sm font-bold text-gray-700">例句字體大小</label>
-            <span className="text-xs text-gray-500 font-bold">{sentenceFontSize}px</span>
-          </div>
-          <input type="range" min="24" max="64" value={sentenceFontSize} onChange={e => setSentenceFontSize(Number(e.target.value))} className="w-full accent-gray-800" />
-        </div>
-
-        {/* 文字輸入 */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="col-span-2 md:col-span-1">
-            <label className="block text-sm font-bold text-gray-700 mb-1">日文單字</label>
-            <textarea value={word} onChange={e => setWord(e.target.value)} rows={2} className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl p-2.5 font-bold focus:border-blue-400 focus:bg-white outline-none resize-none leading-relaxed transition-colors text-sm" />
-          </div>
-          <div className="col-span-2 md:col-span-1">
-            <label className="block text-sm font-bold text-gray-700 mb-1">中文翻譯</label>
-            <input type="text" value={translation} onChange={e => setTranslation(e.target.value)} className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl p-2.5 font-bold focus:border-blue-400 focus:bg-white outline-none transition-colors text-sm" />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-bold text-gray-700 mb-1">日文例句</label>
-          <textarea value={sentenceJP} onChange={e => setSentenceJP(e.target.value)} rows={4} className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl p-2.5 font-bold focus:border-blue-400 focus:bg-white outline-none resize-none leading-relaxed transition-colors text-sm" />
-        </div>
-
-        <button
-          type="button"
-          onClick={handleDownload}
-          className="w-full mt-1 bg-gray-900 hover:bg-black text-white rounded-xl p-3.5 font-black flex items-center justify-center gap-2 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-        >
-          <Download size={20} />
-          一鍵下載為 IG 貼文 (高畫質)
-        </button>
       </div>
-
-      {/* 右側：絕對 100% 同步的 Canvas 預覽區 */}
-      <div className="flex flex-col items-center">
-        <div className="relative w-[360px] h-[360px] sm:w-[460px] sm:h-[460px] lg:w-[520px] lg:h-[520px] bg-gray-100 rounded-[2rem] overflow-hidden shadow-2xl border-[6px] border-white">
-          <canvas 
-            ref={canvasRef} 
-            width={1080} 
-            height={1080} 
-            className="w-full h-full object-contain" 
-          />
-        </div>
-      </div>
-
     </div>
   );
 }
