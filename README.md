@@ -1,29 +1,16 @@
-# 吉武日文小教室 - IG 貼文卡片產生器
+# React + Vite
 
-✨ 快速製作 Instagram 日文單字教學卡片的線上工具！
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
-## 🚀 功能特點
+Currently, two official plugins are available:
 
-- **即時預覽**：右側 Canvas 1080x1080 畫布 100% 同步渲染。
-- **自訂主題**：支援多種吸睛背景主題配色（活力黃、天空藍、櫻花粉、清新綠）。
-- **圖片上傳**：可自訂上傳頭像與右側拍立得插圖。
-- **靈活排版**：單字字體與例句字體大小可動態調整，自動換行對齊橫線。
-- **一鍵下載**：點擊即可瞬間產生高解析度 PNG 圖片並自動命名儲存。
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## 🛠 本地開發
+## React Compiler
 
-```bash
-# 安裝相依套件
-npm install
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-# 啟動開發伺服器
-npm run dev
+## Expanding the Oxlint configuration
 
-# 構建生產版本
-npm run build
-```
-
-## 🌐 部署至 GitHub Pages
-
-本專案已內建 GitHub Actions 自動部署工作流程（`.github/workflows/deploy.yml`）。
-只要將程式碼推送到 `main` 分支，並在 GitHub 儲存庫的 **Settings -> Pages** 將 Source 設定為 **GitHub Actions**，即可自動完成上線！
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
