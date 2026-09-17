@@ -188,11 +188,14 @@ export default function App() {
   const currentTheme = THEMES.find(t => t.id === selectedThemeId) || THEMES[0];
   const sentenceLineHeight = Math.round(sentenceSize * 1.68 * 10) / 10;
 
-  // Responsively scale card to fit mobile screens perfectly
+  // Responsively scale card to fit mobile screens perfectly without any overflow
   useEffect(() => {
     const updateScale = () => {
       if (!stageRef.current) return;
-      const availableWidth = stageRef.current.clientWidth - 24;
+      const computed = window.getComputedStyle(stageRef.current);
+      const paddingLeft = parseFloat(computed.paddingLeft) || 0;
+      const paddingRight = parseFloat(computed.paddingRight) || 0;
+      const availableWidth = Math.floor(stageRef.current.clientWidth - paddingLeft - paddingRight - 4);
       if (availableWidth > 0 && availableWidth < 580) {
         setStageScale(availableWidth / 580);
       } else {
@@ -201,6 +204,8 @@ export default function App() {
     };
 
     updateScale();
+    const timer = setTimeout(updateScale, 50);
+
     window.addEventListener('resize', updateScale);
     let observer = null;
     if (typeof ResizeObserver !== 'undefined' && stageRef.current) {
@@ -208,6 +213,7 @@ export default function App() {
       observer.observe(stageRef.current);
     }
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('resize', updateScale);
       if (observer) observer.disconnect();
     };
@@ -845,23 +851,22 @@ export default function App() {
         {/* Right: Live Preview */}
         <section className="preview-panel">
           <div className="preview-header">
-            <h3 className="preview-title">卡片即時預覽 (WYSIWYG)</h3>
-            <span className="preview-spec-badge">Instagram 1080px 高清規格</span>
+            <h3 className="preview-title">卡片即時預覽</h3>
+            <span className="preview-spec-badge">1080px 高清規格</span>
           </div>
 
           <div className="card-stage" ref={stageRef}>
             <div 
               className="card-scale-container"
               style={{
-                width: `${Math.round(580 * stageScale)}px`,
-                height: `${Math.round((aspectRatio === '4:5' ? 725 : 580) * stageScale)}px`,
+                width: `${Math.floor(580 * stageScale)}px`,
+                height: `${Math.floor((aspectRatio === '4:5' ? 725 : 580) * stageScale)}px`,
               }}
             >
               <div 
                 className="card-scale-inner"
                 style={{
                   transform: `scale(${stageScale})`,
-                  transformOrigin: 'top left',
                   width: '580px',
                   height: aspectRatio === '4:5' ? '725px' : '580px',
                 }}

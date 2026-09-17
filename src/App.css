@@ -8,6 +8,10 @@
   min-height: 100vh;
   background-color: #f1f3f7;
   color: #1e293b;
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Header Bar */
@@ -22,6 +26,9 @@
   position: sticky;
   top: 0;
   z-index: 50;
+  max-width: 100vw;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .header-left {
@@ -118,6 +125,8 @@
   max-width: 1600px;
   margin: 0 auto;
   width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
   box-sizing: border-box;
   flex: 1;
 }
@@ -693,12 +702,20 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .preview-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .preview-title {
@@ -714,31 +731,36 @@
   color: #be185d;
   padding: 4px 10px;
   border-radius: 6px;
+  white-space: nowrap;
 }
 
 .card-stage {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 24px;
+  padding: 20px;
   background: #e9ecf2;
   border-radius: 20px;
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.04);
   overflow: hidden;
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
 }
 
 .card-scale-container {
   margin: 0 auto;
   position: relative;
-  display: flex;
-  justify-content: center;
-  transition: width 0.15s ease, height 0.15s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: 24px;
 }
 
 .card-scale-inner {
-  transform-origin: top left;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
   transition: transform 0.15s ease;
   will-change: transform;
 }
