@@ -163,7 +163,7 @@ export default function App() {
   const [photoUrl, setPhotoUrl] = useState(SAMPLES.noriben.image);
   const [photoSize, setPhotoSize] = useState(235); // in px (180 ~ 280)
   const [wordSize, setWordSize] = useState(40); // in px (28 ~ 56)
-  const [sentenceSize, setSentenceSize] = useState(16.5); // in px (12 ~ 22)
+  const [sentenceSize, setSentenceSize] = useState(20); // in px (14 ~ 30, enlarged for mobile legibility)
   const [aspectRatio, setAspectRatio] = useState('1:1'); // '1:1' | '4:5'
   
   // Brand & Avatar metadata
@@ -180,11 +180,38 @@ export default function App() {
   const [copiedSuccess, setCopiedSuccess] = useState(false);
 
   const cardRef = useRef(null);
+  const stageRef = useRef(null);
+  const [stageScale, setStageScale] = useState(1);
   const fileInputRef = useRef(null);
   const avatarFileInputRef = useRef(null);
 
   const currentTheme = THEMES.find(t => t.id === selectedThemeId) || THEMES[0];
-  const sentenceLineHeight = Math.round(sentenceSize * 1.788 * 10) / 10;
+  const sentenceLineHeight = Math.round(sentenceSize * 1.68 * 10) / 10;
+
+  // Responsively scale card to fit mobile screens perfectly
+  useEffect(() => {
+    const updateScale = () => {
+      if (!stageRef.current) return;
+      const availableWidth = stageRef.current.clientWidth - 24;
+      if (availableWidth > 0 && availableWidth < 580) {
+        setStageScale(availableWidth / 580);
+      } else {
+        setStageScale(1);
+      }
+    };
+
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    let observer = null;
+    if (typeof ResizeObserver !== 'undefined' && stageRef.current) {
+      observer = new ResizeObserver(updateScale);
+      observer.observe(stageRef.current);
+    }
+    return () => {
+      window.removeEventListener('resize', updateScale);
+      if (observer) observer.disconnect();
+    };
+  }, []);
 
   // Sync parsing when rawInput changes
   const handleRawInputChange = (newText) => {
@@ -576,31 +603,38 @@ export default function App() {
                   <div className="size-presets">
                     <button 
                       type="button" 
-                      className={`size-chip ${sentenceSize === 14 ? 'active' : ''}`}
-                      onClick={() => setSentenceSize(14)}
+                      className={`size-chip ${sentenceSize === 17 ? 'active' : ''}`}
+                      onClick={() => setSentenceSize(17)}
                     >
-                      小 (14px)
+                      小 (17px)
                     </button>
                     <button 
                       type="button" 
-                      className={`size-chip ${sentenceSize === 16.5 ? 'active' : ''}`}
-                      onClick={() => setSentenceSize(16.5)}
+                      className={`size-chip ${sentenceSize === 20 ? 'active' : ''}`}
+                      onClick={() => setSentenceSize(20)}
                     >
-                      標準 (16.5px)
+                      標準 (20px)
                     </button>
                     <button 
                       type="button" 
-                      className={`size-chip ${sentenceSize === 19 ? 'active' : ''}`}
-                      onClick={() => setSentenceSize(19)}
+                      className={`size-chip ${sentenceSize === 23 ? 'active' : ''}`}
+                      onClick={() => setSentenceSize(23)}
                     >
-                      大 (19px)
+                      大 (23px)
+                    </button>
+                    <button 
+                      type="button" 
+                      className={`size-chip ${sentenceSize === 26 ? 'active' : ''}`}
+                      onClick={() => setSentenceSize(26)}
+                    >
+                      特大 (26px)
                     </button>
                   </div>
                 </div>
                 <input
                   type="range"
-                  min="12"
-                  max="22"
+                  min="14"
+                  max="30"
                   step="0.5"
                   value={sentenceSize}
                   onChange={(e) => setSentenceSize(Number(e.target.value))}
@@ -815,12 +849,28 @@ export default function App() {
             <span className="preview-spec-badge">Instagram 1080px 高清規格</span>
           </div>
 
-          <div className="card-stage">
-            {/* The Actual Rendered Card */}
+          <div className="card-stage" ref={stageRef}>
             <div 
-              ref={cardRef} 
-              className={`ig-card aspect-${aspectRatio.replace(':', '-')}`}
-              id="exportable-ig-card"
+              className="card-scale-container"
+              style={{
+                width: `${Math.round(580 * stageScale)}px`,
+                height: `${Math.round((aspectRatio === '4:5' ? 725 : 580) * stageScale)}px`,
+              }}
+            >
+              <div 
+                className="card-scale-inner"
+                style={{
+                  transform: `scale(${stageScale})`,
+                  transformOrigin: 'top left',
+                  width: '580px',
+                  height: aspectRatio === '4:5' ? '725px' : '580px',
+                }}
+              >
+                {/* The Actual Rendered Card */}
+                <div 
+                  ref={cardRef} 
+                  className={`ig-card aspect-${aspectRatio.replace(':', '-')}`}
+                  id="exportable-ig-card"
               style={{
                 background: currentTheme.cardBg,
                 '--theme-primary': currentTheme.hex,
@@ -984,7 +1034,7 @@ export default function App() {
                   <p 
                     className="sentence-zh"
                     style={{ 
-                      fontSize: `${Math.max(12, sentenceSize - 1.5)}px`,
+                      fontSize: `${Math.max(13, sentenceSize - 2.5)}px`,
                       lineHeight: `${sentenceLineHeight}px`
                     }}
                   >
@@ -994,7 +1044,9 @@ export default function App() {
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </div>
+    </section>
       </main>
     </div>
   );

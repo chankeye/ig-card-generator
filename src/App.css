@@ -719,12 +719,28 @@
 .card-stage {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   padding: 24px;
   background: #e9ecf2;
   border-radius: 20px;
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.04);
-  overflow-x: auto;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.card-scale-container {
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  transition: width 0.15s ease, height 0.15s ease;
+}
+
+.card-scale-inner {
+  transform-origin: top left;
+  transition: transform 0.15s ease;
+  will-change: transform;
 }
 
 /* =========================================================
@@ -1081,18 +1097,137 @@
 
 .sentence-jp {
   font-family: var(--font-jp);
-  font-size: 16.5px;
+  font-size: 20px;
   font-weight: 800;
   color: #0f172a;
-  line-height: 29.5px;
+  line-height: 33.6px;
   letter-spacing: 0.01em;
 }
 
 .sentence-zh {
   font-family: var(--font-tc);
-  font-size: 15px;
+  font-size: 17.5px;
   font-weight: 700;
   color: #1e293b;
-  line-height: 29.5px;
+  line-height: 33.6px;
   letter-spacing: 0.01em;
+}
+
+/* =========================================================
+   Mobile Responsiveness (手機版體驗優化)
+   ========================================================= */
+
+@media (max-width: 1024px) {
+  .app-main {
+    grid-template-columns: 1fr;
+    padding: 16px;
+    gap: 20px;
+  }
+
+  /* 手機版預覽置頂：讓使用者在最上方即時看到卡片成果 */
+  .preview-panel {
+    order: -1;
+  }
+
+  .preview-header {
+    padding: 0 4px;
+  }
+
+  .card-stage {
+    padding: 16px 12px;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .header-left {
+    justify-content: flex-start;
+  }
+
+  .app-title {
+    font-size: 18px;
+  }
+
+  .app-subtitle {
+    font-size: 12px;
+  }
+
+  .header-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .action-btn {
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  .panel-card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .avatar-control-box {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .avatar-actions {
+    width: 100%;
+  }
+
+  .avatar-btn-row {
+    width: 100%;
+  }
+
+  .avatar-btn-row .upload-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .brand-inputs-row {
+    grid-template-columns: 1fr;
+  }
+
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .theme-picker-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .size-label-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .size-presets {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+
+  .size-chip {
+    text-align: center;
+    padding: 5px 2px;
+    font-size: 11px;
+  }
+
+  .toggle-group {
+    grid-template-columns: 1fr;
+  }
 }
